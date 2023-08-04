@@ -21,6 +21,7 @@ then you will get ssh file under ~/ directory, note that you may need use "ls -a
 ssh -T git@github.com
 ```
 to test if successfully connected.
+
 3. Set username and email
 ```
 git config --global usernmae "your name"
@@ -33,4 +34,18 @@ git remote add origin git@github.com:yourName/yourRepo.git
 5. Normally you can git pull, push with remote repository, and git init, add ., commit -m "comments" with local buff
 
 ## Problems you might encounter
+1. Error: when you push "Updates were rejected because the remote contains work that you do" the solution to this is we need to use 
+```
+git pull origin master 
+```
+before 
+```
+git push -u origin master
+```
+2. Error: when you push "updates were rejected because the tip of your current branch is behind its remote counterpart" the solution to this is the same as 1.
 
+3. Error: when you pull "fatal: refusing to merge unrelated histories", the solution is to add "-allow-unrelated-histories"
+```
+git pull origin master --allow-unrelated-histories
+``` 
+and you might see "please enter a commit message to explain why this merge is necessary ...", if it is opened by vim, you can quit by enter :wq, or if it is in nao model, you ocan press ctrl+x to quit.
