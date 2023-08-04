@@ -6,6 +6,13 @@ clone the souce code:
 ```
 git clone git@github.com:tomojitakasu/RTKLIB.git
 ```
+build the aim software
+```
+cd app/<you aim app>
+cd gcc
+make
+sudo make install 
+```
 
 # Git implementation problems
 The tutorial can be found here: [Github Implement](www.runoob.com/w3cnote/git-guide.html)
