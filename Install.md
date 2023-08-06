@@ -13,6 +13,7 @@ cd gcc
 make
 sudo make install 
 ```
+the most helpful information can be found in RTK manual.
 
 # Git implementation problems
 The tutorial can be found here: [Github Implement](www.runoob.com/w3cnote/git-guide.html)
