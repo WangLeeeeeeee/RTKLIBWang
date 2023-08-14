@@ -1,3 +1,5 @@
+# Show markdown file in ubuntu
+pandoc file.md | lynx -stdin
 # Obtain source code
 The official website is: [RTKLib](www.rtklib.com)
 

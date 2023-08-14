@@ -21,4 +21,17 @@ BDT is a continuous time system without leap second insertion. The start epoch o
 
 $$ t_{BDT} = t_{GPST} - 14 $$
  
-
+## C language notes
+### Why use pointer to pointer or double pointer
+If you want to have a list of characters (a word), you can use
+```
+char *word
+```
+If you want a list of words (a sentence), you can use
+```
+char **sentence
+```
+If you want a list of sentences (a monologue), you can use
+```
+char ***monologue
+```
