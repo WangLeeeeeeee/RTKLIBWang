@@ -60,6 +60,13 @@ git pull origin master --allow-unrelated-histories
 ``` 
 and you might see "please enter a commit message to explain why this merge is necessary ...", if it is opened by vim, you can quit by enter :wq, or if it is in nao model, you ocan press ctrl+x to quit.
 
+4. The authenticity of host 'github.com' can't be established: you need to create ssh key in your computer and add to your github account
+
+5. Error: fatal not a git repository (or any of the parent directories) .git
+```
+git init
+```
+
 ## How to share folder between virtual machine and host
 1. Opening the settings in Oracle VM VirtualBox Manger and set the folder in "Shared Folders"
 
