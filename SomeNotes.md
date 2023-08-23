@@ -61,6 +61,10 @@ sudo apt install curl
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 ```
+Then open a file using vim and input the command
+```
+:PlugInstall
+```
 ### Use GDB to debug the c/c++ program
 Need to add "-g" to start the debug
 ```
