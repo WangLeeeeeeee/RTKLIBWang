@@ -127,3 +127,57 @@ It is because the Release version optimize the code to make it run faster and sm
 ```
 ## The basic procedure of rnx2rtkp.c
 `main(rnx2rtkp.c)`>>postpos(postpos.c)>>openses(postpos.c){readpcv:read satellite receiver antenna,readdcb,readtec,opengeoid,readerp:earth rotation parameter}->execses_b(postpos.c)>>readpreceph{readsp3,r(preceph.c),readrnxc(rinex.c):read precise clock,sbsreadmsg,lexreadmsg}->execses_r(postpos.c)>>execses(postpos.c)>>readobsnav(postpos.c){Initialize, read file1, file2}>>readrnxt(rinex.c)>>readrnxfile>>readrnxfp>>readrnxh{decode_obsh,decode_navh}->readrnxobs{readrnxobsb{decode_obsepoch->decode_obsdata}->saveslips->addobsdata}->readrnxnav
+
+``` mermaid
+graph TD
+main --> postpos;
+postpos --> O{openses};
+O --> R{readpcv};
+postpos --> execses_b;
+execses_b --> readpreceph;
+readpreceph --> readsp3;
+readpreceph --> readrnxc;
+execses_b --> execses_r;
+execses_r --> execses;
+execses --> readobsnav;
+readobsnav --> readrnxt;
+readrnxt --> readrnxfile;
+readrnxfile --> readrnxfp;
+readrnxfp --> readrnxh;
+readrnxfp --> readrnxobs;
+readrnxobs --> readrnxobsb;
+readrnxobsb --> decode_obsepoch;
+readrnxobsb --> decode_obsdata;
+readrnxfp --> savesslips;
+readrnxfp --> addobsdata;
+readrnxfp --> readrnxnav;
+readrnxnav --> readrnxnavb;
+readrnxnavb --> decode_eph;
+readrnxfp --> add_eph;
+```
+## The basic procedure of single position positioning
+``` mermaid
+graph TD
+main --> procpos;
+procpos --> rtkinit;
+procpos --> inputobs;
+procpos --> rtkpos;
+rtkpos --> pntpos;
+pntpos --> satposs;
+satposs --> ephclk;
+ephclk --> seleph;
+satposs --> ephpos;
+ephpos --> seleph;
+ephpos --> eph2pos;
+pntpos --> estpos;
+estpos --> rescode
+rescode --> geodist;
+rescode --> prange;
+rescode --> satexclude;
+rescode --> ionocorr;
+rescode --> tropcorr;
+rescode --> varerr;
+rescode --> lsq;
+rescode --> valsol;
+estpos --> raimfde;
+```
