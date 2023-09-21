@@ -1107,6 +1107,109 @@ static int execses_b(gtime_t ts, gtime_t te, double ti, const prcopt_t *popt,
     
     return stat;
 }
+
+/*This is a test of ouput the observation data*/
+extern int postpos_test(gtime_t ts, gtime_t te, double ti, double tu,
+                   const prcopt_t *popt, const solopt_t *sopt,
+                   const filopt_t *fopt, char **infile, int n, char *outfile,
+                   const char *rov, const char *base)
+{
+    gtime_t tts,tte,ttte;
+    double tunit,tss;
+    int i,j,k,nf,stat=0,week,flag=1,index[MAXINFILE]={0};
+    char *ifile[MAXINFILE],ofile[1024],*ext;
+    int GPS_row=86400,GPS_column=32;
+    double ep[6],curSec;
+    double *GPS_SNR;
+    int pre,cur;
+    int Sumflag,Sqreflag;
+    double SN0Sum;
+    double SI_sqr_ave,SI_ave;
+    int m;
+    double *SN0,*SI_det;
+    double *S4c;
+    prcopt_t popt_=*popt;
+    FILE *fp_s4;
+    flag = 1;
+    
+    trace(3,"postpos : ti=%.0f tu=%.0f n=%d outfile=%s\n",ti,tu,n,outfile);
+
+
+    for (i=0;i<n;i++) index[i]=i;
+    readobsnav(ts,te,ti,infile,index,n,&popt_,&obss,&navs,stas);
+    /*collect SN0 data*/
+    GPS_SNR=mat(GPS_row,GPS_column); 
+    for (i=0;i<obss.n;i++){
+        if (obss.data[i].sat>32) continue;
+        time2epoch(obss.data[i].time,ep);
+        curSec=ep[3]*3600+ep[4]*60+ep[5];
+        GPS_SNR[(obss.data[i].sat-1)*GPS_row+(int)(curSec)]=0.25*obss.data[i].SNR[0];
+    }
+    /* free obs and nav data */
+    freeobsnav(&obss,&navs);
+    /* compute S4_c index from SNO data*/
+    S4c=zeros(GPS_row,GPS_column);
+    for (i=0;i<GPS_column;i++){
+        SN0=zeros(GPS_row,1);
+        SI_det=zeros(GPS_row,1);
+        for (j=0;j<GPS_row;j++){
+            if (!pre&&GPS_SNR[i*GPS_row+j]){
+                pre=j;
+                continue;
+            } 
+            if ((j==GPS_row-1&&pre)||(pre&&GPS_SNR[i*GPS_row+j]&&!GPS_SNR[i*GPS_row+j+1])){
+                cur=j;
+                if (cur-pre>119){
+                    Sumflag=0; Sqreflag=0;
+                    SN0Sum=0; SI_sqr_ave=0; SI_ave=0;
+                    for (k=pre;k<cur+1;k++){
+                        SN0[k]=pow(10,0.1*GPS_SNR[i*GPS_row+k]);
+                        if (k>pre+59){
+                            if (Sumflag==0){
+                                for (m=pre;m<pre+60;m++) SN0Sum+=SN0[m];
+                                Sumflag=1;
+                            }
+                            else{
+                                SN0Sum=SN0Sum+SN0[k]-SN0[k-60];
+                            }
+                            SI_det[k]=SN0[k]/SN0Sum;
+                        }    
+                    }
+                    for (k=pre+119;k<cur+1;k++){
+                        if (Sqreflag==0){
+                            for (m=pre+59;m<pre+119;m++){
+                                SI_sqr_ave+=SI_det[m]*SI_det[m]/60;
+                                SI_ave+=SI_det[m]/60;
+                            }
+                            Sqreflag=1;
+                        }
+                        else{
+                            SI_sqr_ave=SI_sqr_ave+SI_det[k]*SI_det[k]/60-SI_det[k-60]*SI_det[k-60]/60;
+                            SI_ave=SI_ave+SI_det[k]/60-SI_det[k-60]/60;
+                        }
+                        S4c[i*GPS_row+k]=SQRT((SI_sqr_ave-SI_ave*SI_ave)/(SI_ave*SI_ave));
+                    }
+                }
+                pre=0;cur=0;
+            }
+        }    
+        free(SN0); free(SI_det);
+    }
+    /*Output S4c to file for further process*/
+    if (!(fp_s4=fopen(outfile,"w"))) {
+        trace(1,"file open error path:%s\n",outfile);
+        return 0;
+    }
+    for (i=0;i<GPS_row;i++) {
+        for (j=0;j<GPS_column;j++) {
+            fprintf(fp_s4,"%.2f",S4c[j*GPS_row+i]);
+        }
+        fprintf(fp_s4,"\n");
+    }
+    fclose(fp_s4);
+    
+        return stat;
+}
 /* post-processing positioning -------------------------------------------------
 * post-processing positioning
 * args   : gtime_t ts       I   processing start time (ts.time==0: no limit)

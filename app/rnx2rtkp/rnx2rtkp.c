@@ -162,7 +162,11 @@ int main(int argc, char **argv)
         showmsg("error : no input file");
         return -2;
     }
+#if 1
+    ret=postpos_test(ts,te,tint,0.0,&prcopt,&solopt,&filopt,infile,n,outfile,"","");
+#else
     ret=postpos(ts,te,tint,0.0,&prcopt,&solopt,&filopt,infile,n,outfile,"","");
+#endif 
     
     if (!ret) fprintf(stderr,"%40s\r","");
     return ret;
